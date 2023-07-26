@@ -53,7 +53,7 @@ def send_message():
 
 if __name__ == '__main__':
     # local development
-    # app.run(threaded=True, port=int(os.environ.get('PORT', 5000)))
+    # apps.run(threaded=True, port=int(os.environ.get('PORT', 5000)))
 
     # heroku
     app.run(threaded=True, port=int(os.environ.get('PORT', 5000)))
