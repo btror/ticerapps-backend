@@ -4,10 +4,13 @@ from email.message import EmailMessage
 
 from flask import Flask, request
 from dotenv import load_dotenv
+from flask_cors import CORS
 
 load_dotenv()
 
 app = Flask(__name__)
+app.debug = False
+CORS(app)
 
 
 @app.route('/send_message', methods=['POST'])
@@ -40,4 +43,5 @@ def send_message():
         return f"An error occurred: {str(e)}", 500
 
 
-app.run()
+if __name__ == '__main__':
+    app.run(threaded=True, port=int(os.environ.get('PORT', 5000)))
