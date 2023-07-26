@@ -2,7 +2,7 @@ import os
 import smtplib
 from email.message import EmailMessage
 
-from flask import Flask, request
+from flask import Flask, request, jsonify
 from dotenv import load_dotenv
 from flask_cors import CORS
 
@@ -23,7 +23,7 @@ def send_message():
     message_body = data.get('message_body')
 
     if not sender_email or not message_body:
-        return "Missing required data: sender_email or message_body", 400
+        return jsonify({"error": "Missing required data: sender_email or message_body"}), 400
 
     try:
         msg = EmailMessage()
@@ -40,10 +40,10 @@ def send_message():
             server.login(email_address, email_password)
             server.send_message(msg)
 
-        return "Message sent successfully", 200
+        return jsonify({"message": "Message sent successfully"}), 200
 
     except Exception as e:
-        return f"An error occurred: {str(e)}", 500
+        return jsonify({"error": f"An error occurred: {str(e)}"}), 500
 
 
 if __name__ == '__main__':
