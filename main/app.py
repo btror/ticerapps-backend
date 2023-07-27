@@ -5,6 +5,7 @@ from email.message import EmailMessage
 from flask import Flask, request, jsonify
 from dotenv import load_dotenv
 from flask_cors import CORS
+from flask_basicauth import BasicAuth
 
 load_dotenv()
 
@@ -15,8 +16,13 @@ CORS(app)
 if os.environ.get("FLASK_ENV") != "production":
     load_dotenv()
 
+app.config['BASIC_AUTH_USERNAME'] = os.environ.get("BASIC_AUTH_USERNAME")
+app.config['BASIC_AUTH_PASSWORD'] = os.environ.get("BASIC_AUTH_PASSWORD")
+basic_auth = BasicAuth(app)
+
 
 @app.route('/send_message', methods=['POST'])
+@basic_auth.required
 def send_message():
     data = request.get_json()
     sender_email = data.get('sender_email')
