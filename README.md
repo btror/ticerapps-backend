@@ -50,7 +50,7 @@ Steps to deploy backend on Heroku:
 - Create environment.prod.ts file in src/environments in frontend Angular app:
 ```typescript
 export const environment = {
-  production: false,
+  production: true,
   apiUrl: '<heroku URL>/send_message',
 };
 ```
