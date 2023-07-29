@@ -1,26 +1,42 @@
 import unittest
-import requests
 from unittest.mock import patch
+from main.app import app
 
 
-class TestApp(unittest.TestCase):
-    BASE_URL = "http://127.0.0.1:5000"
+class FlaskAppTestCase(unittest.TestCase):
+    def setUp(self):
+        self.app = app.test_client()
+        self.app.testing = True
 
-    @patch("requests.post")
-    def test_send_message(self, mock_post):
+    @patch('smtplib.SMTP_SSL')
+    def test_send_message_success(self, mock_smtp):
+        instance = mock_smtp.return_value
+        instance.login.return_value = None
+
         data = {
-            "sender_email": "sender@example.com",
-            "message_body": "test message",
+            'sender_email': 'sender@example.com',
+            'message_body': 'Test message body'
         }
-        mock_response = mock_post.return_value
-        mock_response.status_code = 200
-        mock_response.text = "Message sent successfully"
 
-        response = requests.post(f"{self.BASE_URL}/send_message", json=data)
+        response = self.app.post('/send_message', json=data)
 
         self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.text, "Message sent successfully")
+        self.assertEqual(response.json, {"message": "Message sent successfully"})
+
+    @patch('smtplib.SMTP_SSL')
+    def test_send_message_missing_data(self, mock_smtp):
+        instance = mock_smtp.return_value
+        instance.login.return_value = None
+
+        data = {
+            'message_body': 'Test message body'
+        }
+
+        response = self.app.post('/send_message', json=data)
+
+        self.assertEqual(response.status_code, 400)
+        self.assertEqual(response.json, {"error": "Missing required data: sender_email or message_body"})
 
 
-if __name__ == "__main__":
+if __name__ == '__main__':
     unittest.main()
