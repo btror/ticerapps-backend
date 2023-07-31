@@ -18,9 +18,9 @@ The application uses environment variables to store sensitive information and co
 
 ### Optional Variables
 
-- ```BASIC_AUTH_USERNAME``` (optional) username for basic authentication when accessing the /send_message endpoint.
+- ```BASIC_AUTH_USERNAME``` username for basic authentication when accessing the /send_message endpoint.
   - uncomment basic_auth.required on endpoint to use.
-- ```BASIC_AUTH_PASSWORD``` (optional) password for basic authentication when accessing the /send_message endpoint.
+- ```BASIC_AUTH_PASSWORD``` password for basic authentication when accessing the /send_message endpoint.
   - uncomment basic_auth.required on endpoint to use.
 
 ## Running the Application
