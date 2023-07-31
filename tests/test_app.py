@@ -19,7 +19,6 @@ if os.environ.get("FLASK_ENV") != "production":
 app.config['BASIC_AUTH_USERNAME'] = os.environ.get("BASIC_AUTH_USERNAME")
 app.config['BASIC_AUTH_PASSWORD'] = os.environ.get("BASIC_AUTH_PASSWORD")
 
-# Apply @basic_auth.required decorator only when not in testing mode
 if not app.testing:
     basic_auth = BasicAuth(app)
 
