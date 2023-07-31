@@ -12,11 +12,16 @@ Before running the application, ensure you have Python and Flask installed on yo
 The application uses environment variables to store sensitive information and configuration. Create a .env file in the root directory and add the following environment variables:
 
 - ```FLASK_ENV``` set this to production in production environments.
-- ```BASIC_AUTH_USERNAME``` (optional) username for basic authentication when accessing the /send_message endpoint.
-- ```BASIC_AUTH_PASSWORD``` (optional) password for basic authentication when accessing the /send_message endpoint.
 - ```EMAIL_ADDRESS``` email address used as the sender for the notifications.
 - ```EMAIL_PASSWORD``` password for the sender email account.
 - ```PORT``` port number for the Flask application to run (default is 5000).
+
+### Optional Variables
+
+- ```BASIC_AUTH_USERNAME``` username for basic authentication when accessing the /send_message endpoint.
+  - uncomment basic_auth.required on endpoint to use.
+- ```BASIC_AUTH_PASSWORD``` password for basic authentication when accessing the /send_message endpoint.
+  - uncomment basic_auth.required on endpoint to use.
 
 ## Running the Application
 
