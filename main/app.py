@@ -22,7 +22,7 @@ basic_auth = BasicAuth(app)
 
 
 @app.route('/send_message', methods=['POST'])
-# @basic_auth.required
+@basic_auth.required
 def send_message():
     data = request.get_json()
     sender_email = data.get('sender_email')

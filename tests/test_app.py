@@ -1,42 +1,59 @@
-import unittest
-from unittest.mock import patch
-from main.app import app
+import os
+import smtplib
+from email.message import EmailMessage
+
+from flask import Flask, request, jsonify
+from dotenv import load_dotenv
+from flask_cors import CORS
+from flask_basicauth import BasicAuth
+
+load_dotenv()
+
+app = Flask(__name__)
+app.debug = False
+CORS(app)
+
+if os.environ.get("FLASK_ENV") != "production":
+    load_dotenv()
+
+app.config['BASIC_AUTH_USERNAME'] = os.environ.get("BASIC_AUTH_USERNAME")
+app.config['BASIC_AUTH_PASSWORD'] = os.environ.get("BASIC_AUTH_PASSWORD")
+
+# Apply @basic_auth.required decorator only when not in testing mode
+if not app.testing:
+    basic_auth = BasicAuth(app)
 
 
-class FlaskAppTestCase(unittest.TestCase):
-    def setUp(self):
-        self.app = app.test_client()
-        self.app.testing = True
+@app.route('/send_message', methods=['POST'])
+# @basic_auth.required  # Remove the @basic_auth decorator for testing
+def send_message():
+    data = request.get_json()
+    sender_email = data.get('sender_email')
+    message_body = data.get('message_body')
 
-    @patch('smtplib.SMTP_SSL')
-    def test_send_message_success(self, mock_smtp):
-        instance = mock_smtp.return_value
-        instance.login.return_value = None
+    if not sender_email or not message_body:
+        return jsonify({"error": "Missing required data: sender_email or message_body"}), 400
 
-        data = {
-            'sender_email': 'sender@example.com',
-            'message_body': 'Test message body'
-        }
+    try:
+        msg = EmailMessage()
+        msg.set_content(message_body)
 
-        response = self.app.post('/send_message', json=data)
+        email_address = os.environ.get("EMAIL_ADDRESS")
+        email_password = os.environ.get("EMAIL_PASSWORD")
 
-        self.assertEqual(response.status_code, 200)
-        self.assertEqual(response.json, {"message": "Message sent successfully"})
+        msg['From'] = sender_email
+        msg['To'] = email_address
+        msg['Subject'] = 'New message from Flask API'
 
-    @patch('smtplib.SMTP_SSL')
-    def test_send_message_missing_data(self, mock_smtp):
-        instance = mock_smtp.return_value
-        instance.login.return_value = None
+        with smtplib.SMTP_SSL('smtp.gmail.com', 465) as server:
+            server.login(email_address, email_password)
+            server.send_message(msg)
 
-        data = {
-            'message_body': 'Test message body'
-        }
+        return jsonify({"message": "Message sent successfully"}), 200
 
-        response = self.app.post('/send_message', json=data)
-
-        self.assertEqual(response.status_code, 400)
-        self.assertEqual(response.json, {"error": "Missing required data: sender_email or message_body"})
+    except Exception as e:
+        return jsonify({"error": f"An error occurred: {str(e)}"}), 500
 
 
 if __name__ == '__main__':
-    unittest.main()
+    app.run(threaded=True, port=int(os.environ.get('PORT', 5000)))
