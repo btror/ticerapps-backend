@@ -18,13 +18,14 @@ CORS(app)
 if os.environ.get("FLASK_ENV") != "production":
     load_dotenv()
 
+# Optional configuration. Only required if basic_auth decorator is uncommented. Ignore otherwise.
 app.config["BASIC_AUTH_USERNAME"] = os.environ.get("BASIC_AUTH_USERNAME")
 app.config["BASIC_AUTH_PASSWORD"] = os.environ.get("BASIC_AUTH_PASSWORD")
 basic_auth = BasicAuth(app)
 
 
 @app.route("/send_message", methods=["POST"])
-# @basic_auth.required # uncomment to require authentication for endpoint access
+# @basic_auth.required  # Uncomment to require authentication for endpoint access
 def send_message():
     data = request.get_json()
     sender_email = data.get("sender_email")
